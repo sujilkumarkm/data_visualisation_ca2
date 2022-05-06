@@ -5,7 +5,6 @@ import dash_bootstrap_components as dbc
 
 # must add this line in order for the app to be deployed successfully on Heroku
 # from app import server
-from app import app
 # import all pages in the app
 from apps import dashboard, task123, Europe, home
 

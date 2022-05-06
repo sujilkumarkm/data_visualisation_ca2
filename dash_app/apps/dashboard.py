@@ -80,7 +80,7 @@ def update_graph(selected_cont,rangevalue):
             data.append(d[d['county'] == j])
    
     df=df.infer_objects()
-    scat_fig = px.scatter(data_frame=df, x="distance_from_goal", y="angle",
+    scat_fig = px.scatter(data_frame=d, x="distance_from_goal", y="angle",
                 size="county", color="county",hover_name="county",
                 # different colour for each country
                 # color_discrete_map=color_discrete_map, //////////// 
