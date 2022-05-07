@@ -1,19 +1,22 @@
+from turtle import color
 from dash import dcc
 from dash import html
+from app import server
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 
 # must add this line in order for the app to be deployed successfully on Heroku
 # from app import server
+from app import app
 # import all pages in the app
-from apps import dashboard, task123, Europe, home
+from apps import dashboard, task123, policy, home
 
 # building the navigation bar
-# https://github.com/facultyai/dash-bootstrap-components/blob/master/examples/advanced-component-usage/Navbars.py
 dropdown = dbc.DropdownMenu(
     children=[
-        dbc.DropdownMenuItem("Home", href="/home"),
+        # dbc.DropdownMenuItem("Home", href="/home"),
         dbc.DropdownMenuItem("Dashboard", href="/dashboard"),
+        # dbc.DropdownMenuItem("Policy", href="/policy"),
         dbc.DropdownMenuItem("Global", href="/task123"),
         # dbc.DropdownMenuItem("Europe", href="/Europe"),
     ],
@@ -45,11 +48,33 @@ navbar = dbc.Navbar(
                 id="navbar-collapse2",
                 navbar=True,
             ),
+            html.A(dbc.Row(
+                    [                        
+                        dbc.DropdownMenuItem("About Us", className="ml-2"),
+                    ],
+                    align="center",
+                ),href="/home#aboutme",),
+                 html.A(dbc.Row(
+                    [                        
+                        dbc.DropdownMenuItem("Privacy Policy", className="ml-2"),
+                    ],
+                    align="center",
+                ),href="/policy",),
         ]
-    ),
+    ),sticky="top",
     color="dark",
     dark=True,
     className="mb-4",
+)
+row = html.Div(
+    [
+        dbc.Row(dbc.Col(html.Div("A single column"))),
+        dbc.Row(
+            [
+                dbc.Col(html.Div("One of three columns")),
+            ]
+        ),
+    ]
 )
 
 def toggle_navbar_collapse(n, is_open):
@@ -75,8 +100,8 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/task123':
-        return task123.layout
+    if pathname == '/policy':
+        return policy.layout
     elif pathname == '/dashboard':
         return dashboard.layout
     # elif pathname == '/Europe':
@@ -85,4 +110,4 @@ def display_page(pathname):
         return home.layout
 
 if __name__ == '__main__':
-    app.run_server(port = 8000, debug=True)
+    app.run_server(port = 8000, debug=False)

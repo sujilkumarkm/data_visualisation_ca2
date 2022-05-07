@@ -1,43 +1,37 @@
-#import packages to create app
-import dash
-from dash import dcc
-from dash import html
-from dash.dependencies import Input, Output
 
-from gapminder import gapminder
-
+# import dash
+from dash import Dash, dcc, html, Input, Output
+import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import numpy as np
-import plotly.express as px
 
-df = pd.read_csv('E:\\Data_Visualization\\data_visualisation_ca2_dkit\\cleaned_data.csv')
+df = pd.read_csv('cleaned_data.csv')
 columns=list(df.columns)
 county_names = df['county'].unique()
 
-
-# needed only if running this as part of a multipage app
+    # # needed only if running this as part of a multipage app
 from app import app
-#app = dash.Dash(__name__)
-#change background and color text
+
 colors = {
     #background to rgb(233, 238, 245)
-    'background': '#bfbfbf',
-    'text': '#1c1cbd'
+    # 'background': '#bfbfbf',
+    # 'text': '#1c1cbd'
 }
 color_discrete_map = {'Cavan': '#636EFA', 'Armagh': '#EF553B', 'Down': '#00CC96',
     'Dublin': '#AB63FA', 'Kerry': '#FFA15A'}
 
 
 
-layout = html.Div(style={'backgroundColor': colors['background']},children=[
+layout = html.Div(children=[
     html.H1('Gealic Match Analysis',
         style={
             'textAlign': 'center',
-            'color': '#1c1cbd',
+            'color': '#fffff',
             }
             ),
             html.Div([
+            dbc.Col(children=[
             html.Label('Select Counties'),
             dcc.Dropdown(id='county_drop',
                         options=[{'label': i, 'value': i}
@@ -45,8 +39,10 @@ layout = html.Div(style={'backgroundColor': colors['background']},children=[
                         value=['Cavan', 'Armagh', 'Down', 'Dublin', 'Kerry'],
                         multi=True
             )
+            ], className='pl-2 pb-4')
         ],style={'width': '49%', 'display': 'inline-block'}),
         html.Div([
+        dbc.Col(children=[
         html.Label('Select Build Up Pass Range'),
         dcc.RangeSlider(id='pass_range',
             min=0,
@@ -60,40 +56,54 @@ layout = html.Div(style={'backgroundColor': colors['background']},children=[
                 30: '30',
             },
         )
-],style={'width': '49%', 'float': 'right', 'display': 'inline-block'}),
-                dcc.Graph(
-        id='county_Graph'
-    ),
+        ],className='pb-2')
+],style={'width': '49%', 'float': 'right', 'display': 'inline-block', 'background':'#fffff',}),
+        dcc.Graph(id="distance_graph"),
+        dbc.Row([
+            # 2 columns of width 6 with a border
+            dbc.Col(children=[
+                    dbc.Col(html.H5(children='Copyright © 2022, Dundalk Institute of Technology. All Rights Reserved',
+                    className="text-center pt-2 pb-2"),
+                                        
+            ),
+            dbc.Col(children=[
+                    dbc.Col(
+                    html.H5(children='Mob : +353 89 273 817',
+                    className="text-center pb-2"),
+                                  
+                )
+
+            ]),
+            dbc.Col(children=[
+                    dbc.Col(
+                    html.H5(children='Email : d00242726@student.dkit.ie',
+                    className="text-center pb-2"),
+                                  
+                )
+
+            ])
+
+    ]),
+    ],className="pt-4")
 
 ])
-@app.callback(
-    Output(component_id='county_Graph', component_property='figure'),
-    [Input(component_id='county_drop', component_property='value'),
-     Input(component_id='pass_range', component_property='value')]
-)
-def update_graph(selected_cont,rangevalue):
-    if not selected_cont:
-        return dash.no_update
-    data =[]
-    d = df[(df['build_up_passes'] >= rangevalue[0]) & (df['distance_from_goal'] <= rangevalue[1])]
-    for j in selected_cont:
-            data.append(d[d['county'] == j])
-   
-    df=df.infer_objects()
-    scat_fig = px.scatter(data_frame=d, x="distance_from_goal", y="angle",
-                size="county", color="county",hover_name="county",
-                # different colour for each country
-                # color_discrete_map=color_discrete_map, //////////// 
-               #add frame by year to create animation grouped by country
-            #    animation_frame="shot_id",animation_group="county", /////////////
-               #specify formating of markers and axes
-            #    log_x = True, size_max=60, range_x=[100,100000], range_y=[28,92],
-                # change labels
-                labels={'pop':'Population','year':'Year','continent':'Continent',
-                        'country':'Country','lifeExp':'Life Expectancy','gdpPercap':"GDP/Capita"})
-    # Change the axis titles and add background colour using rgb syntax
-    scat_fig.update_layout({'xaxis': {'title': {'text': 'log(GDP Per Capita)'}},
-                  'yaxis': {'title': {'text': 'Life Expectancy'}}}, 
-                  plot_bgcolor='rgb(233, 238, 245)',paper_bgcolor='rgb(233, 238, 245)')
 
-    return scat_fig
+
+@app.callback(
+    Output(component_id='distance_graph', component_property='figure'),
+    [Input(component_id='county_drop', component_property='value')]
+)
+# def update_graph(selected_county) :
+#     filtered_county = df[df['county'] == selected_county]
+#     line_fig = px.line(filtered_county,
+#     X='game', y='build_up_passes',
+#     color='type',
+#     title=f'Player Status in {selected_county}')
+#     return line_fig
+
+def update_line_chart(county_names):
+    mask = df.county.isin(county_names)
+    fig = px.line(df[mask], 
+        x="build_up_passes", y="distance_from_goal", color='county')
+    return fig
+
