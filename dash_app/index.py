@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 # must add this line in order for the app to be deployed successfully on Heroku
 # from app import server
 from app import app
+from app import server
 # import all pages in the app
 from apps import dashboard, task123, policy, home
 
@@ -110,4 +111,4 @@ def display_page(pathname):
         return home.layout
 
 if __name__ == '__main__':
-    app.run_server(port = 8000, debug=False)
+    app.run_server(port = 8079, debug=False)

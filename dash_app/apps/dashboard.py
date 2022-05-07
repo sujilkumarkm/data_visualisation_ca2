@@ -27,7 +27,7 @@ layout = html.Div(children=[
     html.H1('Gealic Match Analysis',
         style={
             'textAlign': 'center',
-            'color': '#fffff',
+            'color': '#00000',
             }
             ),
             html.Div([
@@ -53,12 +53,15 @@ layout = html.Div(children=[
                 0: '0',
                 10: '10',
                 20: '20',
-                30: '30',
+                29: '29',
             },
         )
         ],className='pb-2')
 ],style={'width': '49%', 'float': 'right', 'display': 'inline-block', 'background':'#fffff',}),
-        dcc.Graph(id="distance_graph"),
+        dbc.Row([
+            dbc.Col(children=[
+            dcc.Graph(id="distance_graph")]),
+            dbc.Col(children=[dcc.Graph(id="short_type_graph")])]),
         dbc.Row([
             # 2 columns of width 6 with a border
             dbc.Col(children=[
@@ -90,7 +93,8 @@ layout = html.Div(children=[
 
 
 @app.callback(
-    Output(component_id='distance_graph', component_property='figure'),
+    [Output(component_id='distance_graph', component_property='figure'),
+     Output(component_id='short_type_graph', component_property='figure')],
     [Input(component_id='county_drop', component_property='value')]
 )
 # def update_graph(selected_county) :
@@ -104,6 +108,12 @@ layout = html.Div(children=[
 def update_line_chart(county_names):
     mask = df.county.isin(county_names)
     fig = px.line(df[mask], 
-        x="build_up_passes", y="distance_from_goal", color='county')
-    return fig
+    x="build_up_passes", y="distance_from_goal", color='county')
+    
+    mask1 = df.county.isin(county_names)
+    fig1 = px.line(df[mask1],x="shot_outcome", y="distance_from_goal", color='county')
+    return fig,fig1
+
+
+
 
